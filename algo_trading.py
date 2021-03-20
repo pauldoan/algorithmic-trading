@@ -12,7 +12,8 @@ currency = 'BTC'
 ################################################################################
 # API STUFF
 
-with open('/Users/paul/Library/Mobile Documents/com~apple~CloudDocs/1 Personal/2 Finances/1 Bank/coinbasepro.json') as f:
+# with open('/Users/paul/Library/Mobile Documents/com~apple~CloudDocs/1 Personal/2 Finances/1 Bank/coinbasepro.json') as f:
+with open('/home/ubuntu/coinbasepro.json') as f:
     api = json.load(f)
 
 auth_client = cbpro.AuthenticatedClient(api['api_key'], api['api_secret'], api['passphrase'])
@@ -21,7 +22,7 @@ auth_client = cbpro.AuthenticatedClient(api['api_key'], api['api_secret'], api['
 # Investment Details
 
 # Amount to initially invest
-initial_investment = 5
+initial_investment = 10
 
 # Amount that will be used for purchase starts at the initial amount
 funding = initial_investment
@@ -88,7 +89,7 @@ while True:
 
     # Get latest data and show to the user for reference
     newData = auth_client.get_product_ticker(product_id=product)
-    print(newData)
+    # print(newData)
     currentPrice = newData['price']
 
     # computing signals
@@ -121,7 +122,7 @@ while True:
         auth_client.place_market_order(product_id=product, side='buy', funds=str(funding))
 
         # Print message in the terminal for reference
-        message = "Buying Approximately " + str(possiblePurchase) + " " + currency + "  Now @ " + str(currentPrice) + "/Coin. TOTAL = " + str(funding)
+        message = "BUYING Approximately " + str(possiblePurchase) + " " + currency + "  Now @ " + str(currentPrice) + "/Coin. TOTAL = " + str(funding)
         print(message)
 
         # Update funding level and Buy variable
@@ -135,7 +136,7 @@ while True:
         auth_client.place_market_order(product_id=product, side='sell', size=str(owned))
 
         # Print message in the terminal for reference
-        message = "Selling " + str(owned) + " " + currency + "Now @ " + str(currentPrice) + "/Coin. TOTAL = " + str(possibleIncome)
+        message = "SELLING " + str(owned) + " " + currency + "Now @ " + str(currentPrice) + "/Coin. TOTAL = " + str(possibleIncome)
         print(message)
 
         # Update funding level and Buy variable
