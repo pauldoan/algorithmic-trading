@@ -46,7 +46,7 @@ period = 300
 iteration = 1
 
 # Start off by looking to buy
-buy = True
+buy = False
 
 ################################################################################
 # Begin Loop and get Historic Data
@@ -156,6 +156,7 @@ while True:
     # Printing here to make the details easier to read in the terminal
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     print("iteration number", iteration)
+    print('time: ', str(dt.datetime.now()))
 
     # Print the details for reference
     print("Current Price: ", currentPrice)
