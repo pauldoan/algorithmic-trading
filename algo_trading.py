@@ -79,9 +79,6 @@ while True:
 
     # Get latest data and show to the user for reference
     latest_data = auth_client.get_product_ticker(product_id=product)
-    print('date: ', pd.to_datetime(latest_data['time']).strftime('%Y-%m-%d %H:%M:%S'))
-    print('price: ', '$ ' + latest_data['price'])
-    print('volume: ', latest_data['volume'])
     current_price = latest_data['price']
 
     # computing signals
