@@ -120,10 +120,10 @@ while True:
 
         print('Portfolio state')
         print('- - - - - - - -')
-        print('Funding: ', funding)
+        print('Funding: $', funding)
         new_owned_currency = float(auth_client.get_account(account_id)['available'])
         new_owned_usd = float(auth_client.get_account(account_id)['available']) * float(current_price)
-        print(f'Crypto: {currency} ', new_owned_currency, f'| $ ', new_owned_usd)
+        print(f'Crypto: {currency}', new_owned_currency, f'| $', new_owned_usd)
         print('*' * 30)
         print('\n')
 
@@ -159,9 +159,10 @@ while True:
 
     # Stop loss: sell everything and stop trading if your value is
     # less than 80% of initial investment
-    if (possible_sell + funding) <= 0.8 * initial_investment:
+    new_investment = funding + float(auth_client.get_account(account_id)['available']) * float(current_price)
+    if new_investment <= 0.8 * initial_investment:
         # If there is any of the crypto owned, sell it all
-        if owned > 0.0:
+        if float(auth_client.get_account(account_id)['available']) > 0.0:
             auth_client.place_market_order(product_id=product, side='sell', size=str(owned))
             print(f"STOP LOSS SOLD ALL at {pd.to_datetime(latest_data['time']).strftime('%Y-%m-%d %H:%M:%S')}")
         # Will break out of the while loop and the program will end
