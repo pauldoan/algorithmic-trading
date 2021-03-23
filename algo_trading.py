@@ -39,7 +39,7 @@ def getSpecificAccount(cur):
 account_id = getSpecificAccount(currency)
 
 # Granularity (in seconds). So 300 = data from every 5 min
-period = 300
+period = 3600
 
 # Start off by looking to buy
 buy = True
@@ -52,7 +52,7 @@ while True:
     # Here we get price for that last day
     # getting historical data
     prices = pd.DataFrame()
-    end = dt.datetime.now()
+    end = dt.datetime.utcnow()
     start = end - dt.timedelta(days=1)
     historicData = auth_client.get_product_historic_rates(product, granularity=period, start=start, end=end)
     historicData = pd.DataFrame(historicData, columns=['date', 'low', 'high', 'open', 'close', 'volume']).sort_values('date', ascending=False).reset_index(drop=True)
@@ -60,7 +60,7 @@ while True:
 
     # adding two other days of data
     for i in range(2):
-        time.sleep(1)
+        time.sleep(30)
         end = start
         start = end - dt.timedelta(days=1)
         historicData = auth_client.get_product_historic_rates(product, granularity=period, start=start, end=end)
@@ -75,7 +75,7 @@ while True:
     prices = prices[['ico_id', 'ico_symbol', 'date', 'low', 'high', 'open', 'close', 'volume']]
 
     # Wait for 1 second, to avoid API limit
-    time.sleep(1)
+    time.sleep(30)
 
     # Get latest data and show to the user for reference
     latest_data = auth_client.get_product_ticker(product_id=product)
@@ -175,5 +175,5 @@ while True:
         # Will break out of the while loop and the program will end
         break
 
-    # Wait for 5 minutes before repeating
-    time.sleep(300)
+    # Wait for 1 hour  before repeating
+    time.sleep(3600)
