@@ -82,11 +82,16 @@ while True:
     current_price = latest_data['price']
 
     # computing signals
-    indicators = ['mama', 'frama', 'sar', 'bop', 'roc', 'adosc']
-    weights = [0.2768361581920904, 0.06779661016949153, 0.18361581920903955, 0.20056497175141244, 0.05649717514124294, 0.21468926553672316]
-    threshold = .5
-    comb = ta.CombinedIndicator(indicators, weights, threshold)
-    signals = comb.get_signals(prices)
+
+    # we use Combined indicator
+    # indicators = ['mama', 'frama', 'sar', 'bop', 'roc', 'adosc']
+    # weights = [0.2768361581920904, 0.06779661016949153, 0.18361581920903955, 0.20056497175141244, 0.05649717514124294, 0.21468926553672316]
+    # threshold = .5
+    # comb = ta.CombinedIndicator(indicators, weights, threshold)
+    # signals = comb.get_signals(prices)
+
+    # we use SAR
+    signals = ta.sar(prices)
 
     ################################################################################
     # Funds to Use
@@ -113,6 +118,7 @@ while True:
         print('\n')
         print('*' * 30)
         print("BUYING " + str(possible_purchase) + " " + currency + " for " + str(current_price) + f"/Coin at {pd.to_datetime(latest_data['time']).strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f'$ {funding} worth of {currency} bought')
 
         # Update funding level and Buy variable
         funding = 0
@@ -137,6 +143,7 @@ while True:
         print('\n')
         print('*' * 30)
         print("SELLING " + str(owned) + " " + currency + " for " + str(current_price) + f"/Coin at {pd.to_datetime(latest_data['time']).strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f'$ {possible_sell} worth of {currency} sold')
 
         # Update funding level and Buy variable
         funding = int(possible_sell)

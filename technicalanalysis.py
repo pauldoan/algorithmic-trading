@@ -18,6 +18,7 @@ from functools import reduce
 import pandas as _pd
 import numpy as _np
 import quantstats as _qs
+import matplotlib.pyplot as _plt
 
 
 ###########
@@ -176,6 +177,46 @@ def get_pnl(signals):
     pnl['strategy_cumulative_roi'] = (pnl.strategy_daily_roi + 1).cumprod().fillna(1) - 1
 
     return pnl
+
+
+def plot_signals(signals, figsize=(17, 10), notebook=True):
+    '''
+    Plotting prices with signals.
+    '''
+    # _plt.style.use('fivethirtyeight')
+    # _plt.style.use("dark_background")
+    # _plt.rcParams['grid.color'] = '#3c4f6e'
+
+    # Plotting main price line
+    fig, ax = _plt.subplots(figsize=figsize)
+    signals.plot(x='date', y='close', linewidth=1, label='price', color='slategray', ax=ax)
+
+    # Creating a new dataframe only for signals
+    signals_1 = signals[signals.signal == 1].copy()
+    signals_min1 = signals[signals.signal == -1].copy()
+
+    # Annotating signals for better visibility - Bearish signals
+    ax.scatter(signals_min1.date.values, signals_min1.close.values, color='Red', s=50)
+    for i in range(len(signals_min1)):
+        ax.annotate('Bearish', xy=(signals_min1.date.values[i], signals_min1.close.values[i]),
+                    textcoords='offset points', xytext=(0, 13), color='white',
+                    bbox=dict(boxstyle="Round", fc="red", alpha=.8), horizontalalignment='center', verticalalignment='bottom')
+
+    # Annotating signals for better visibility - Bullish signals
+    ax.scatter(signals_1.date.values, signals_1.close.values, color='lime', s=50)
+    for i in range(len(signals_1)):
+        ax.annotate('Bullish', xy=(signals_1.date.values[i], signals_1.close.values[i]),
+                    textcoords='offset points', xytext=(0, 13), color='white',
+                    bbox=dict(boxstyle="Round", fc="green", alpha=.8), horizontalalignment='center', verticalalignment='bottom')
+
+    # Titles and legend
+    ax.legend(loc='best')
+    _plt.title('Signals')
+
+    if notebook:
+        _plt.show()
+    else:
+        return fig
 
 
 ############################
