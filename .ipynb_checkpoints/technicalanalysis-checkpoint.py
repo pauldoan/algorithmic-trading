@@ -26,31 +26,19 @@ import matplotlib.pyplot as _plt
 ###########
 
 
-def signals_stats(signals, exchange=None):
+def signals_stats(signals):
     '''
     Computing several stats on set of trading signals (accuracy, roi, mean, max, min)
-    taking into account the trading fees
 
     parameters
     ----------
     signals: dataframe with the trading signals
-    exchange: coinbase,
 
     output
     -------
     dictionnary containing the stats
     '''
-    # Creating a dictionnary to contain all statistics
-    fees_dict = dict(binance=.001, coinbase=.015, coinbase_pro=.005, bibox=.0015)
-    if exchange is None:
-        fees = 0
-    else:
-        fees = fees_dict.get(exchange)
-        if fees is None:
-            print('No information about this exchange fees')
-            return None
-
-    # Creating a dictionnary to contain all statistics
+    # Creating a dictionnary to contain all statistics about the Mama indicator
     stats = dict()
 
     # make sure there is at least 1 buy signal
@@ -60,7 +48,7 @@ def signals_stats(signals, exchange=None):
     # First computing the holding ROI if we had bought on the first signal and hodl
     initial_price = signals[signals.signal == 1].iloc[0].close
     last_price = signals.iloc[-1].close
-    holding_roi = ((1 - fees) * last_price - initial_price - fees * (1 - fees) * last_price) / initial_price
+    holding_roi = (last_price - initial_price) / initial_price
 
     # Retrieving signals only
     signals_only = signals[signals.signal != 0]
@@ -78,13 +66,13 @@ def signals_stats(signals, exchange=None):
     unrealized = False
     if _pd.isna(trades.sell.iloc[-1]):
         unrealized = True
-        unrealized_roi = ((1 - fees) * last_price - trades.buy.iloc[-1] - fees * (1 - fees) * last_price) / trades.buy.iloc[-1] + 1
+        unrealized_roi = (last_price - trades.buy.iloc[-1]) / trades.buy.iloc[-1] + 1
 
     # dropping NAN now that we dealt with unrealized
     trades = trades.dropna()
 
-    # ROI, included fees and unrealized ROI if needed
-    trades['roi'] = ((1 - fees) * trades.sell - trades.buy - fees * (1 - fees) * trades.sell) / trades.buy + 1
+    # ROI, included unrealized if needed
+    trades['roi'] = (trades.sell - trades.buy) / trades.buy + 1
 
     if unrealized:
         rois = list(trades.roi)
@@ -98,9 +86,6 @@ def signals_stats(signals, exchange=None):
     # holding ROI
     stats['holding_roi'] = holding_roi
 
-    # # CAGR
-    # stats['strategy_CAGR'], stats['holding_CAGR'] = CAGR(signals)
-
     # Accuracy
     trades['hit'] = trades.buy < trades.sell
     stats['accuracy'] = trades.hit.mean()
@@ -108,7 +93,6 @@ def signals_stats(signals, exchange=None):
     # quantstats
     pnl = get_pnl(signals)
     daily_returns = pnl.set_index('date').strategy_daily_roi
-    stats['sharpe'] = _qs.stats.sharpe(daily_returns, periods=365)
     stats['sortino'] = _qs.stats.sortino(daily_returns, periods=365)
     stats['max_drawdown'] = _qs.stats.max_drawdown(daily_returns)
     stats['volatility'] = _qs.stats.volatility(daily_returns, periods=365)
