@@ -44,6 +44,9 @@ period = 3600
 # Start off by looking to buy
 buy = True
 
+# keep track of ROI
+bought_price = None
+
 ################################################################################
 # Begin Loop and get Historic Data
 
@@ -120,6 +123,9 @@ while True:
         print("BUYING " + str(possible_purchase) + " " + currency + " for " + str(current_price) + f"/Coin at {pd.to_datetime(latest_data['time']).strftime('%Y-%m-%d %H:%M:%S')}")
         print(f'$ {funding} worth of {currency} bought')
 
+        # keep track of tradings
+        bought_price = funding
+
         # Update funding level and Buy variable
         funding = 0
         buy = False
@@ -134,16 +140,24 @@ while True:
         print('\n')
 
     # Sell Conditions: sell signal
-    elif buy == False and signals.signal.iloc[-1] == - 1:
+    elif buy == False and signals.signal.iloc[-1] == -1:
 
         # Place the order
         auth_client.place_market_order(product_id=product, side='sell', size=str(owned))
+
+        # keep track of tradings
+        sold_price = possible_sell
+        if bought_price is not None:
+            roi = ((1 - .005) * sold_price - bought_price - .005 * (1 - .005) * sold_price) / bought_price
+        else:
+            roi = 'Not computed'
 
         # Print message in the terminal for reference
         print('\n')
         print('*' * 30)
         print("SELLING " + str(owned) + " " + currency + " for " + str(current_price) + f"/Coin at {pd.to_datetime(latest_data['time']).strftime('%Y-%m-%d %H:%M:%S')}")
         print(f'$ {possible_sell} worth of {currency} sold')
+        print(f'ROI: {roi}')
 
         # Update funding level and Buy variable
         funding = int(possible_sell)
